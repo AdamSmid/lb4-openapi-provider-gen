@@ -21,8 +21,10 @@ const temporary = await mkdtemp(join(tmpdir(), 'lb4-provider-package-'));
 try {
   const destination = join(temporary, 'tarballs');
   await mkdir(destination);
-  // --json output is machine-readable; lifecycle messages go to stderr.
-  const [pack] = JSON.parse(npm(['pack', '--json', '--pack-destination', destination], root));
+  // npm publish --dry-run exports npm_config_dry_run to lifecycle scripts.
+  // These temporary pack/install steps need real files even during that dry run.
+  // Override only the local child commands; the outer publish stays a dry run.
+  const [pack] = JSON.parse(npm(['pack', '--dry-run=false', '--json', '--pack-destination', destination], root));
   const paths = pack.files.map(file => file.path);
   for (const required of ['package.json', 'README.md', 'LICENSE', 'CHANGELOG.md', 'dist/cli.js', 'dist/generator.js', 'dist/generator.d.ts', 'src/generator.ts']) {
     assert.ok(paths.includes(required), `Package is missing ${required}`);
@@ -34,7 +36,7 @@ try {
   const project = join(temporary, 'consumer');
   await mkdir(project);
   await writeFile(join(project, 'package.json'), JSON.stringify({name: 'package-smoke-test', version: '1.0.0', private: true, type: 'module'}));
-  npm(['install', '--omit=dev', '--ignore-scripts', '--no-audit', '--no-fund', join(destination, pack.filename)], project);
+  npm(['install', '--dry-run=false', '--omit=dev', '--ignore-scripts', '--no-audit', '--no-fund', join(destination, pack.filename)], project);
   const installed = join(project, 'node_modules', manifest.name);
   const cli = join(installed, 'dist/cli.js');
   assert.equal(command(process.execPath, [cli, '--version'], project).trim(), manifest.version);

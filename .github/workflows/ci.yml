@@ -24,6 +24,6 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
-      - run: npm test
-      - run: npm run check:example
-      - run: npm run test:package
+      # Exercises prepublishOnly (tests, example and package install), including
+      # npm's inherited dry-run configuration, without publishing to the registry.
+      - run: npm publish --dry-run
