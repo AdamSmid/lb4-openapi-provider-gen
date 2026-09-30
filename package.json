@@ -1,0 +1,75 @@
+{
+  "name": "lb4-openapi-provider-gen",
+  "version": "0.1.0",
+  "description": "Generate typed LoopBack service providers from OpenAPI 3.0 specifications",
+  "type": "module",
+  "bin": {
+    "lb4-openapi-provider-gen": "dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/generator.d.ts",
+      "import": "./dist/generator.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/cli.js",
+    "prepack": "npm run build",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "generate:example": "npm run build && node dist/cli.js examples/inventory.openapi.yaml --name Inventory --datasource-import ./inventory.datasource --output examples/inventory.service.ts --force",
+    "check:example": "node dist/cli.js examples/inventory.openapi.yaml --name Inventory --datasource-import ./inventory.datasource --output examples/inventory.service.ts --check",
+    "test:package": "node scripts/test-package.mjs",
+    "prepublishOnly": "npm test && npm run check:example && npm run test:package",
+    "check:release": "node scripts/check-release.mjs"
+  },
+  "dependencies": {
+    "lodash": "4.18.1",
+    "openapi-typescript": "7.13.0",
+    "typescript": "~5.2.2",
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@loopback/core": "^7.0.10",
+    "@loopback/service-proxy": "^8.0.10",
+    "@types/lodash": "4.17.20",
+    "@types/node": "^22.10.0",
+    "loopback-connector-openapi": "6.2.0"
+  },
+  "license": "MIT",
+  "author": "Adam Šmíd",
+  "keywords": [
+    "loopback",
+    "loopback4",
+    "lb4",
+    "openapi",
+    "typescript",
+    "codegen",
+    "cli",
+    "provider"
+  ],
+  "main": "./dist/generator.js",
+  "types": "./dist/generator.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdamSmid/lb4-openapi-provider-gen.git"
+  },
+  "homepage": "https://github.com/AdamSmid/lb4-openapi-provider-gen#readme",
+  "bugs": {
+    "url": "https://github.com/AdamSmid/lb4-openapi-provider-gen/issues"
+  }
+}
